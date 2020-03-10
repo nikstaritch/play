@@ -16,15 +16,31 @@ namespace SloReviewTool
     public partial class MainWindow : Window
     {
         SloQueryManager queryManager_;
+        public string PlaceholderText { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
             queryManager_ = new SloQueryManager();
+
         }
 
         Task<Tuple<List<SloRecord>, List<SloValidationException>>> ExecuteQueryAsync(string query)
         {
+            string updateQuery;
+            if (GuidEx.IsGuid(query))
+            {
+                updateQuery = $"GetSloJsonActionItemReport() | where ServiceId == '{query}'";
+                query = updateQuery;
+
+            }
+            else if (!GuidEx.IsGuid(query))
+            {
+                updateQuery = $"GetSloJsonActionItemReport() | where ServiceName contains '{query}'";
+                query = updateQuery;
+            }
+            updateQuery = "";
+
             return Task.Run(() => {
                 return queryManager_.ExecuteQuery(query);
             });
@@ -38,7 +54,9 @@ namespace SloReviewTool
             this.ResultsDataGrid.ItemsSource = null;
             this.ErrorListView.ItemsSource = null;
 
-            try {
+            try
+            {
+
                 var results = await ExecuteQueryAsync(QueryTextBox.Text);
 
                 QueryStatus.Content = $"Query returned {results.Item1.Count + results.Item2.Count} record(s), {results.Item2.Count} failed to parse";
@@ -47,7 +65,9 @@ namespace SloReviewTool
                 ResultsDataGrid.ItemsSource = sloRecords;
                 ErrorListView.ItemsSource = results.Item2;
 
-            } catch(Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 System.Windows.MessageBox.Show(ex.Message);
             }
 
@@ -75,6 +95,15 @@ namespace SloReviewTool
         {
             var sloValidator = new SloValidatorView();
             sloValidator.Show();
+        }
+
+        public static class GuidEx
+        {
+            public static bool IsGuid(string value)
+            {
+                Guid x;
+                return Guid.TryParse(value, out x);
+            }
         }
     }
 }

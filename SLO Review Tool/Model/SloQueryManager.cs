@@ -53,7 +53,9 @@ namespace SloReviewTool.Model
 
                     } catch(SloValidationException ex) {
                         errors.Add(ex);
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         Debug.WriteLine($"Schema violation: {ex.Message}");
                     }
                 }
