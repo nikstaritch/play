@@ -45,12 +45,18 @@ namespace SloReviewTool
         {
 
             Update.IsEnabled = false;
-            var reviews = new List<SloManualReview>();
-            reviews.Add(new SloManualReview(slo_));
-            await queryManager_.PublishManualReviews(reviews);
-            Update.Content = "Updated";
-            Update.Background = new SolidColorBrush(Colors.Green);
-            Update.Foreground = Brushes.White;
+            try
+            {
+                var reviews = new List<SloManualReview>();
+                reviews.Add(new SloManualReview(slo_));
+                await queryManager_.PublishManualReviews(reviews);
+                Update.Content = "Updated";
+                Update.Background = new SolidColorBrush(Colors.Green);
+                Update.Foreground = Brushes.White;
+            } catch(Exception ex) {
+                System.Windows.MessageBox.Show(ex.Message);
+            }
+
             Update.IsEnabled = true;
         }
 
