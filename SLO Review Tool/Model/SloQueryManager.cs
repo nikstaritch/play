@@ -17,7 +17,7 @@ namespace SloReviewTool.Model
 
         readonly string kustoUrl_ = "https://azurequality.westus2.kusto.windows.net/AzureQuality";
         readonly string kustoDb_ = "AzureQuality";
-        readonly string kustoManualReviewTable_ = "SloDefinitionManualReview";
+        readonly string kustoManualReviewTable_ = "SloDefinitionManualReviewDev";
 
         public SloQueryManager()
         {
@@ -37,7 +37,7 @@ namespace SloReviewTool.Model
             var uniqueServiceIds = new SortedSet<string>();
 
             // Append to the query the join to get the review data
-            query += @"| project ServiceId, OrganizationName, ServiceGroupName, TeamGroupName, ServiceName, YamlValue, ServiceIdGuid = toguid(ServiceId) | join kind = leftouter SloDefinitionManualReview on $left.ServiceIdGuid == $right.ServiceId | sort by ReviewDate desc ";
+            query += $@"| project ServiceId, OrganizationName, ServiceGroupName, TeamGroupName, ServiceName, YamlValue, ServiceIdGuid = toguid(ServiceId) | join kind = leftouter {kustoManualReviewTable_} on $left.ServiceIdGuid == $right.ServiceId | sort by ReviewDate desc ";
 
             // "GetSloJsonActionItemReport() | where YamlValue contains ServiceId"
             using (var results = client_.ExecuteQuery(query)) {
@@ -74,10 +74,25 @@ namespace SloReviewTool.Model
             slo.TeamGroupName = record["TeamGroupName"] as string;
             slo.ServiceName = record["ServiceName"] as string;
             slo.SetYamlValue(record["YamlValue"] as string);
-            if (!record.IsDBNull(record.GetOrdinal("ReviewPassed"))) slo.ReviewPassed = ((sbyte) record.GetValue(record.GetOrdinal("ReviewPassed")) != 0);
+            if (!record.IsDBNull(record.GetOrdinal("ReviewPassed")))
+            {
+                slo.ReviewPassed = ((sbyte)record.GetValue(record.GetOrdinal("ReviewPassed")) != 0);
+            }
             slo.ReviewDetails = record["ReviewDetails"] as string;
-            if(!record.IsDBNull(record.GetOrdinal("ReviewDate"))) slo.ReviewDate = record.GetDateTime(record.GetOrdinal("ReviewDate"));
+            if (!record.IsDBNull(record.GetOrdinal("ReviewDate")))
+            {
+                slo.ReviewDate = record.GetDateTime(record.GetOrdinal("ReviewDate"));
+            }
             slo.ReviewedBy = record["ReviewedBy"] as string;
+            slo.AdvancedReviewRequired = !record.IsDBNull(record.GetOrdinal("AdvancedReviewRequired"))
+                ? Convert.ToBoolean(record["AdvancedReviewRequired"])
+                : false;
+            slo.AcknowledgmentDetails = record["AcknowledgmentDetails"] as string;
+            slo.AcknowledgmentDate = !record.IsDBNull(record.GetOrdinal("AcknowledgmentDate"))
+                    ? (DateTime)record["AcknowledgmentDate"]
+                    : default;
+            slo.AcknowledgedBy = record["AcknowledgedBy"] as string;
+            slo.AcknowledgedYamlValue = record["SloDefinition"] as string;
 
             return slo;
         }

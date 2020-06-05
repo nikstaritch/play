@@ -13,6 +13,11 @@ namespace SloReviewTool.Model
             ServiceId = Guid.Parse(record.ServiceId);
             ReviewPassed = record.ReviewPassed;
             ReviewDetails = record.ReviewDetails;
+            AdvancedReviewRequired = record.AdvancedReviewRequired;
+            AcknowledgmentDetails = record.AcknowledgmentDetails;
+            AcknowledgmentDate = record.AcknowledgmentDate;
+            AcknowledgedBy = record.AcknowledgedBy;
+            AcknowledgedYamlValue = record.AcknowledgedYamlValue;
 
             // Update Review Date to be the current date
             ReviewDate = DateTime.Now;
@@ -24,9 +29,23 @@ namespace SloReviewTool.Model
         }
 
         public Guid ServiceId { get; set; }
+
         public bool ReviewPassed{ get; set; }
+
         public string ReviewDetails { get; set; }
+
         public DateTime ReviewDate { get; set; }
+
         public string ReviewedBy { get; set; }
+
+        public bool AdvancedReviewRequired { get; set; }
+
+        public string AcknowledgmentDetails { get; set; }
+
+        public DateTime AcknowledgmentDate { get; set; }
+
+        public string AcknowledgedBy { get; set; }
+
+        public string AcknowledgedYamlValue { get; set; }
     }
 }
