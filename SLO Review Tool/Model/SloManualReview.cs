@@ -13,7 +13,9 @@ namespace SloReviewTool.Model
             ServiceId = Guid.Parse(record.ServiceId);
             ReviewPassed = record.ReviewPassed;
             ReviewDetails = record.ReviewDetails;
-            AdvancedReviewRequired = record.AdvancedReviewRequired;
+            // reset Advanced review required flag if the reviewer resets the manual review
+            // so service owners can address new comments
+            AdvancedReviewRequired = record.ReviewPassed ? record.AdvancedReviewRequired : false;
             AcknowledgmentDetails = record.AcknowledgmentDetails;
             AcknowledgmentDate = record.AcknowledgmentDate;
             AcknowledgedBy = record.AcknowledgedBy;

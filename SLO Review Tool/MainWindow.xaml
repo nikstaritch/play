@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SloReviewTool"
         mc:Ignorable="d"
-        Title="SLO Review Tool " Height="450" Width="800">
+        Title="SLO Review Tool (Dev) " Height="450" Width="800">
     <Grid Margin="20px">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

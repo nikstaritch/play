@@ -179,6 +179,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\ManualReviewRecord.cs" />
     <Compile Include="Model\NullToVisibilityConverter.cs" />
     <Compile Include="Model\Slo.cs" />
     <Compile Include="Model\SloDataSource.cs" />

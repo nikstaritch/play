@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-
 
 namespace SloReviewTool.Model
 {
@@ -37,6 +35,19 @@ namespace SloReviewTool.Model
         public string AcknowledgedBy { get; set; }
 
         public string AcknowledgedYamlValue { get; set; }
+
+        public void AddManualReview(ManualReviewRecord manualReviewRecord)
+        {
+            ReviewDetails = manualReviewRecord.ReviewDetails;
+            ReviewPassed = manualReviewRecord.ReviewPassed;
+            ReviewDate = manualReviewRecord.ReviewDate;
+            ReviewedBy = manualReviewRecord.ReviewedBy;
+            AdvancedReviewRequired = manualReviewRecord.AdvancedReviewRequired;
+            AcknowledgmentDetails = manualReviewRecord.AcknowledgmentDetails;
+            AcknowledgmentDate = manualReviewRecord.AcknowledgmentDate;
+            AcknowledgedBy = manualReviewRecord.AcknowledgedBy;
+            AcknowledgedYamlValue = manualReviewRecord.AcknowledgedYamlValue;
+        }
 
         public void SetYamlValue(string yaml)
         {
