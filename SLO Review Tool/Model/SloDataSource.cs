@@ -17,7 +17,16 @@ namespace SloReviewTool.Model
         {
             Id = SloValidator.GetString(this.GetType().Name, dataSource, "id");
             Type = SloValidator.GetString(this.GetType().Name, dataSource, "type");
-            AccountIds = SloDataSourceAccountId.ParseList(SloValidator.GetList(this.GetType().Name, dataSource, "accountids"));
+            //AccountIds = SloDataSourceAccountId.ParseList(SloValidator.GetList(this.GetType().Name, dataSource, "accountids"));
+
+            try
+            {
+                AccountIds = SloDataSourceAccountId.ParseList(SloValidator.GetList(this.GetType().Name, dataSource, "accountids"));
+            }
+            catch (Exception)
+            {
+                AccountIds = new List<SloDataSourceAccountId>();
+            }
         }
 
         public static List<SloDataSource> ParseList(List<object> dataSources)

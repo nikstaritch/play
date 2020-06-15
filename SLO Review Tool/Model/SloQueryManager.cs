@@ -17,8 +17,8 @@ namespace SloReviewTool.Model
 
         readonly string kustoUrl_ = "https://azurequality.westus2.kusto.windows.net/AzureQuality";
         readonly string kustoDb_ = "AzureQuality";
-        readonly string kustoManualReviewTable_ = "SloDefinitionManualReviewDev";
-        readonly string manualRviewCommentsQuery_ = "GetLatestManualReviewDecisionDev";
+        readonly string kustoManualReviewTable_ = "SloDefinitionManualReview";
+        readonly string manualReviewCommentsQuery_ = "GetLatestManualReviewDecision";
 
         public SloQueryManager()
         {
@@ -83,8 +83,8 @@ namespace SloReviewTool.Model
         public ManualReviewRecord ReadManualReview(string serviceId)
         {
             ClientRequestProperties requestProperties = new ClientRequestProperties();
-            requestProperties.SetParameter("ServiceIdentifier", serviceId);
-            IDataReader manualReviewDataRecord = client_.ExecuteQuery(kustoDb_, manualRviewCommentsQuery_, requestProperties);
+            string kustoQuery = $"{manualReviewCommentsQuery_} | where ServiceId == '{serviceId}'";
+            IDataReader manualReviewDataRecord = client_.ExecuteQuery(kustoDb_, kustoQuery, requestProperties);
             DataTableReader2 dataRecord = (DataTableReader2)manualReviewDataRecord;
             if (!dataRecord.HasRows)
             {

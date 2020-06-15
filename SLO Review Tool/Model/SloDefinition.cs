@@ -36,7 +36,16 @@ namespace SloReviewTool.Model
             SloDictionary = ParseSloText(SloYaml);
 
             DataSources = SloDataSource.ParseList(SloValidator.GetList(this.GetType().Name, SloDictionary, "datasources"));
-            SloGroups = SloGroup.ParseList(SloValidator.GetList(this.GetType().Name, SloDictionary, "slo-groups"));
+            //SloGroups = SloGroup.ParseList(SloValidator.GetList(this.GetType().Name, SloDictionary, "slo-groups"));
+
+            try
+            {
+                SloGroups = SloGroup.ParseList(SloValidator.GetList(this.GetType().Name, SloDictionary, "slo-groups"));
+            }
+            catch
+            {
+                SloGroups = new List<SloGroup>();
+            }
         }
 
         Dictionary<object, object> ParseSloText(string sloText)
@@ -47,7 +56,8 @@ namespace SloReviewTool.Model
 
         static string ConvertServiceTreeJsonToYaml(string rawText)
         {
-            rawText = rawText.Replace(@"\n", "\n");
+            //rawText = rawText.Replace(@"\n", "\n");
+            rawText = rawText.Replace(System.Environment.NewLine, "\n");
 
             // For now, parse JSON to get SLO yaml.  Service Tree should be fixed.
             var json = JObject.Parse(rawText);
