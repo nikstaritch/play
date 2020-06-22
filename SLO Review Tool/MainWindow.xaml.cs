@@ -25,28 +25,36 @@ namespace SloReviewTool
 
         }
 
-        Task<Tuple<List<SloRecord>, List<SloValidationException>>> ExecuteQueryAsync(string query)
+        /// <summary>
+        /// Executes Kusto query to obtain service data that includes manual review data.
+        /// </summary>
+        /// <param name="criteria">Service ID, service name or blank string to return the complete list of services.</param>
+        /// <returns>
+        /// A list of <see cref="SloRecord"/> objects with a potential <see cref="SloValidationException"/> list that is
+        /// returned as a tuple.
+        /// </returns>
+        public Task<Tuple<List<SloRecord>, List<SloValidationException>>> ExecuteQueryAsync(string criteria)
         {
-            string updateQuery;
-            if(string.IsNullOrWhiteSpace(query))
+            string kustoQuery;
+            if(string.IsNullOrWhiteSpace(criteria))
             {
-                query = "GetSloJsonActionItemReport() ";
+                kustoQuery = "GetSloJsonActionItemReport() ";
             }
-            else if (GuidEx.IsGuid(query))
+            else if (GuidEx.IsGuid(criteria))
             {
-                updateQuery = $"GetSloJsonActionItemReport() | where ServiceId == '{query.Trim()}' ";
-                query = updateQuery;
-
+                kustoQuery = $"GetSloJsonActionItemReport() | where ServiceId == '{criteria.Trim()}' ";
             }
-            else if (!GuidEx.IsGuid(query))
+            else if (!GuidEx.IsGuid(criteria))
             {
-                updateQuery = $"GetSloJsonActionItemReport() | where ServiceName contains '{query.Trim()}' ";
-                query = updateQuery;
+                kustoQuery = $"GetSloJsonActionItemReport() | where ServiceName contains '{criteria.Trim()}' ";
             }
-            updateQuery = "";
+            else
+            {
+                kustoQuery = criteria;
+            }
 
             return Task.Run(() => {
-                return queryManager_.ExecuteQuery(query);
+                return queryManager_.ExecuteQuery(kustoQuery);
             });
 
         }

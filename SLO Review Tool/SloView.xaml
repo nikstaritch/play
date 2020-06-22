@@ -150,32 +150,32 @@
             <Button x:Name="NextRecord" FontFamily="Marlett" FontSize="20" Content="4" Width="25" HorizontalAlignment="Left" Margin="332,0,-0.333,0" Click="NextRecord_Click" Visibility="Hidden" />
             <TextBlock Text="Manual Review" Style="{StaticResource Title}" />
             <TextBlock Text="Manual Review Details: " Style="{StaticResource Label}" />
-            <TextBox Text="{Binding ReviewDetails}" Height="400" AcceptsReturn="True" TextWrapping="Wrap" Margin="0, 10, 10, 10" Padding="10"/>
-            <WrapPanel Margin="0, 5, 10, 10">
+            <TextBox Text="{Binding ReviewDetails}" Height="400" AcceptsReturn="True" TextWrapping="Wrap" Margin="0, 10, 10, 5" Padding="10"/>
+            <WrapPanel Margin="0, 5, 10, 5">
                 <TextBlock Text="Passed: " Style="{StaticResource Label}" />
                 <CheckBox IsChecked="{Binding ReviewPassed}" VerticalAlignment="Center" />
             </WrapPanel>
-            <WrapPanel Margin="0, 5, 10, 10">
+            <WrapPanel Margin="0, 5, 10, 5">
                 <TextBlock Text="Reviewed On: " Style="{StaticResource Label}" />
                 <TextBlock Text="{Binding ReviewDate}" VerticalAlignment="Center" />
             </WrapPanel>
-            <WrapPanel Margin="0, 5, 10, 10">
+            <WrapPanel Margin="0, 5, 10, 5">
                 <TextBlock Text="Reviewed By: " Style="{StaticResource Label}" />
                 <TextBlock Text="{Binding ReviewedBy}" VerticalAlignment="Center" />
             </WrapPanel>
             <TextBlock Text="Acknowledgment Details: " Style="{StaticResource Label}" />
-            <TextBox Text="{Binding AcknowledgmentDetails}" Height="150" AcceptsReturn="True" TextWrapping="Wrap" Margin="0, 5, 10, 10" Padding="10"/>
-            <WrapPanel Margin="0, 5, 10, 10">
+                <TextBox Text="{Binding AcknowledgmentDetails}" IsReadOnly="True" Height="150" AcceptsReturn="True" TextWrapping="Wrap" Margin="0, 5, 10, 5" Padding="10"/>
+            <WrapPanel Margin="0, 5, 10, 5">
                 <TextBlock Text="Acknowledged On: " Style="{StaticResource Label}" />
                 <TextBlock Text="{Binding AcknowledgmentDate}" VerticalAlignment="Center" />
             </WrapPanel>
-            <WrapPanel Margin="0, 5, 10, 10">
+            <WrapPanel Margin="0, 5, 10, 5">
                 <TextBlock Text="Acknowledged By: " Style="{StaticResource Label}" />
                 <TextBlock Text="{Binding AcknowledgedBy}" VerticalAlignment="Center" />
             </WrapPanel>
-            <WrapPanel Margin="0, 5, 10, 10">
+            <WrapPanel Margin="0, 5, 10, 5">
                 <TextBlock Text="OASIS Requirements: " Style="{StaticResource Label}" />
-                <CheckBox IsChecked="{Binding AdvancedReviewRequired}" VerticalAlignment="Center" />
+                <CheckBox IsChecked="{Binding AdvancedReviewRequired}" IsHitTestVisible="False" Focusable="False" VerticalAlignment="Center" />
             </WrapPanel>
 
             <Button Name="Update" Content="Update" Click="UpdateButton_Click" Margin="0, 20"/>

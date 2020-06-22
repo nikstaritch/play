@@ -31,13 +31,25 @@ namespace SloReviewTool.Model
             client_ = KustoClientFactory.CreateCslQueryProvider(kcsb);
         }
 
+        /// <summary>
+        /// Executes Kusto query obtain combined service and manual review data based on <paramref name="query"/>.
+        /// </summary>
+        /// <param name="query">A query with the initial criteria.</param>
+        /// <returns>
+        /// A list of <see cref="SloRecord"/> objects with a potential <see cref="SloValidationException"/> list that is
+        /// returned as a tuple.
+        /// </returns>
+        /// <remarks>
+        /// The constructed query obtains service data using <c>GetSloJsonActionItemReport</c> Kusto query and review data
+        /// using <c>GetLatestManualReviewDecision</c> Kusto query via a table join. If the initial criteria was blank, then
+        /// the data is obtained for the whole list of services.
+        /// </remarks>
         public Tuple<List<SloRecord>, List<SloValidationException>> ExecuteQuery(string query)
         {
             var items = new List<SloRecord>();
             var errors = new List<SloValidationException>();
             var uniqueServiceIds = new SortedSet<string>();
 
-            // Append to the query the join to get the review data
             query += $@"| project ServiceId, OrganizationName, ServiceGroupName, TeamGroupName, ServiceName, YamlValue | join kind = leftouter GetLatestManualReviewDecision() on $left.ServiceId == $right.ServiceId | project-away ServiceId1";
 
             // "GetSloJsonActionItemReport() | where YamlValue contains ServiceId"
@@ -64,6 +76,11 @@ namespace SloReviewTool.Model
             return Tuple.Create(items, errors);
         }
 
+        /// <summary>
+        /// Populate <see cref="SloRecord"/> model with the <paramref name="record"/> data obtained from running the Kusto query.
+        /// </summary>
+        /// <param name="record">Kusto data mapped as <see cref="IDataRecord"/> from a single entry.</param>
+        /// <returns><see cref="SloRecord"/> object that contains service and review data.</returns>
         SloRecord ReadSingleResult(IDataRecord record)
         {
             var slo = new SloRecord();
@@ -94,39 +111,11 @@ namespace SloReviewTool.Model
             return slo;
         }
 
-        public ManualReviewRecord ReadManualReview(string serviceId)
-        {
-            ClientRequestProperties requestProperties = new ClientRequestProperties();
-            string kustoQuery = $"{manualReviewCommentsQuery_} | where ServiceId == '{serviceId}'";
-            IDataReader manualReviewDataRecord = client_.ExecuteQuery(kustoDb_, kustoQuery, requestProperties);
-            DataTableReader2 dataRecord = (DataTableReader2)manualReviewDataRecord;
-            if (!dataRecord.HasRows)
-            {
-                return new ManualReviewRecord();
-            }
-
-            manualReviewDataRecord.Read();
-            return new ManualReviewRecord
-            {
-                ServiceId = manualReviewDataRecord["ServiceId"].ToString(),
-                ReviewPassed = Convert.ToBoolean(manualReviewDataRecord["ReviewPassed"]),
-                ReviewDetails = manualReviewDataRecord["ReviewDetails"].ToString(),
-                ReviewDate = !manualReviewDataRecord.IsDBNull(manualReviewDataRecord.GetOrdinal("ReviewDate"))
-                    ? (DateTime)manualReviewDataRecord["ReviewDate"]
-                    : new DateTime(),
-                ReviewedBy = manualReviewDataRecord["ReviewedBy"].ToString(),
-                AdvancedReviewRequired = !manualReviewDataRecord.IsDBNull(manualReviewDataRecord.GetOrdinal("AdvancedReviewRequired"))
-                    ? Convert.ToBoolean(manualReviewDataRecord["AdvancedReviewRequired"]) 
-                    : false,
-                AcknowledgmentDetails = manualReviewDataRecord["AcknowledgmentDetails"].ToString(),
-                AcknowledgmentDate = !manualReviewDataRecord.IsDBNull(manualReviewDataRecord.GetOrdinal("AcknowledgmentDate")) 
-                    ? (DateTime)manualReviewDataRecord["AcknowledgmentDate"] 
-                    : new DateTime(),
-                AcknowledgedBy = manualReviewDataRecord["AcknowledgedBy"].ToString(),
-                AcknowledgedYamlValue = manualReviewDataRecord["SloDefinition"].ToString()
-            };
-        }
-
+        /// <summary>
+        /// Adds a record with <paramref name="results"/> in <see cref="kustoManualReviewTable_"/> table.
+        /// </summary>
+        /// <param name="results">Update manual review data.</param>
+        /// <returns></returns>
         public async Task PublishManualReviews(IEnumerable<SloManualReview> results)
         {
             var dt = results.ToDataTable();
