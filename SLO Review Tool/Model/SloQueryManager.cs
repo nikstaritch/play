@@ -18,7 +18,6 @@ namespace SloReviewTool.Model
         readonly string kustoUrl_ = "https://azurequality.westus2.kusto.windows.net/AzureQuality";
         readonly string kustoDb_ = "AzureQuality";
         readonly string kustoManualReviewTable_ = "SloDefinitionManualReview";
-        readonly string manualReviewCommentsQuery_ = "GetLatestManualReviewDecision";
 
         public SloQueryManager()
         {
