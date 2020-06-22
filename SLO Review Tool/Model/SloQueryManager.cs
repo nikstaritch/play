@@ -38,7 +38,7 @@ namespace SloReviewTool.Model
             var uniqueServiceIds = new SortedSet<string>();
 
             // Append to the query the join to get the review data
-            query += $@"| project ServiceId, OrganizationName, ServiceGroupName, TeamGroupName, ServiceName, YamlValue, ServiceIdGuid = toguid(ServiceId)";
+            query += $@"| project ServiceId, OrganizationName, ServiceGroupName, TeamGroupName, ServiceName, YamlValue | join kind = leftouter GetLatestManualReviewDecision() on $left.ServiceId == $right.ServiceId | project-away ServiceId1";
 
             // "GetSloJsonActionItemReport() | where YamlValue contains ServiceId"
             using (var results = client_.ExecuteQuery(query)) {
@@ -48,8 +48,6 @@ namespace SloReviewTool.Model
 
                         // Only add the latest value
                         if (!uniqueServiceIds.Contains(result.ServiceId)) {
-                            ManualReviewRecord manualReviewRecord = ReadManualReview(result.ServiceId);
-                            result.AddManualReview(manualReviewRecord);
                             items.Add(result);
                             uniqueServiceIds.Add(result.ServiceId);
                         }
@@ -76,6 +74,22 @@ namespace SloReviewTool.Model
             slo.TeamGroupName = record["TeamGroupName"] as string;
             slo.ServiceName = record["ServiceName"] as string;
             slo.SetYamlValue(record["YamlValue"] as string);
+
+            slo.ReviewPassed = Convert.ToBoolean(record["ReviewPassed"]);
+            slo.ReviewDetails = record["ReviewDetails"].ToString();
+            slo.ReviewDate = !record.IsDBNull(record.GetOrdinal("ReviewDate"))
+                ? (DateTime)record["ReviewDate"]
+                : new DateTime();
+            slo.ReviewedBy = record["ReviewedBy"].ToString();
+            slo.AdvancedReviewRequired = !record.IsDBNull(record.GetOrdinal("AdvancedReviewRequired"))
+                ? Convert.ToBoolean(record["AdvancedReviewRequired"])
+                : false;
+            slo.AcknowledgmentDetails = record["AcknowledgmentDetails"].ToString();
+            slo.AcknowledgmentDate = !record.IsDBNull(record.GetOrdinal("AcknowledgmentDate"))
+                ? (DateTime)record["AcknowledgmentDate"]
+                : new DateTime();
+            slo.AcknowledgedBy = record["AcknowledgedBy"].ToString();
+            slo.AcknowledgedYamlValue = record["SloDefinition"].ToString();
 
             return slo;
         }

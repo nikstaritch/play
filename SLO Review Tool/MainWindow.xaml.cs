@@ -28,15 +28,19 @@ namespace SloReviewTool
         Task<Tuple<List<SloRecord>, List<SloValidationException>>> ExecuteQueryAsync(string query)
         {
             string updateQuery;
-            if (GuidEx.IsGuid(query))
+            if(string.IsNullOrWhiteSpace(query))
             {
-                updateQuery = $"GetSloJsonActionItemReport() | where ServiceId == '{query}'";
+                query = "GetSloJsonActionItemReport() ";
+            }
+            else if (GuidEx.IsGuid(query))
+            {
+                updateQuery = $"GetSloJsonActionItemReport() | where ServiceId == '{query.Trim()}' ";
                 query = updateQuery;
 
             }
             else if (!GuidEx.IsGuid(query))
             {
-                updateQuery = $"GetSloJsonActionItemReport() | where ServiceName contains '{query}'";
+                updateQuery = $"GetSloJsonActionItemReport() | where ServiceName contains '{query.Trim()}' ";
                 query = updateQuery;
             }
             updateQuery = "";
